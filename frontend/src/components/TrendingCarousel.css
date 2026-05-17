@@ -1,0 +1,43 @@
+.carousel {
+  width: 100%;
+}
+
+.carousel__track-wrap {
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.carousel__track {
+  display: flex;
+  transition: transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.carousel__slide {
+  flex: 0 0 100%;
+  padding: 4px;
+}
+
+.carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    background 0.2s;
+}
+
+.carousel__dot--active {
+  background: linear-gradient(135deg, #a855f7, #22d3ee);
+  transform: scale(1.25);
+}

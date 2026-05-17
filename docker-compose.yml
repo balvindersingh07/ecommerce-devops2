@@ -1,0 +1,23 @@
+# Optional: create a root `.env` with `BACKEND_HOST_PORT=5001` if port 5000 is already
+# in use (e.g. `npm run dev` in `backend/`). Inside the stack, other services still use
+# `backend:5000` on the Docker network.
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "${BACKEND_HOST_PORT:-5000}:5000"
+    environment:
+      - PORT=5000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NGINX_CONF: nginx.docker.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

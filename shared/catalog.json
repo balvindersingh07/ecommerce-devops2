@@ -1,0 +1,107 @@
+{
+  "categories": [
+    {
+      "id": "electronics",
+      "label": "Electronics",
+      "tagline": "Precision tech",
+      "accent": "linear-gradient(135deg, #6366f1 0%, #22d3ee 100%)",
+      "icon": "⚡"
+    },
+    {
+      "id": "fashion",
+      "label": "Fashion",
+      "tagline": "Season essentials",
+      "accent": "linear-gradient(135deg, #a855f7 0%, #ec4899 100%)",
+      "icon": "✦"
+    },
+    {
+      "id": "gadgets",
+      "label": "Gadgets",
+      "tagline": "Smart accessories",
+      "accent": "linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)",
+      "icon": "◇"
+    }
+  ],
+  "products": [
+    {
+      "id": "p1",
+      "name": "Aura Wireless Buds Pro",
+      "category": "gadgets",
+      "price": 8999,
+      "rating": 4.8,
+      "reviews": 1240,
+      "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80",
+      "description": "Spatial audio, ANC, and a glass-matte case. Built for motion and silence."
+    },
+    {
+      "id": "p2",
+      "name": "Neon Fold Phone",
+      "category": "electronics",
+      "price": 74999,
+      "rating": 4.6,
+      "reviews": 892,
+      "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80",
+      "description": "Flexible OLED with holographic UI accents. Futuristic pocket studio."
+    },
+    {
+      "id": "p3",
+      "name": "Velvet Street Jacket",
+      "category": "fashion",
+      "price": 5999,
+      "rating": 4.7,
+      "reviews": 356,
+      "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
+      "description": "Technical weave with reflective seams. Weather-ready silhouette."
+    },
+    {
+      "id": "p4",
+      "name": "Pulse Smartwatch X",
+      "category": "gadgets",
+      "price": 12999,
+      "rating": 4.5,
+      "reviews": 2103,
+      "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+      "description": "Bio sensors, sapphire lens, week-long battery in a titanium shell."
+    },
+    {
+      "id": "p5",
+      "name": "Lumen 4K Display",
+      "category": "electronics",
+      "price": 28999,
+      "rating": 4.9,
+      "reviews": 445,
+      "image": "https://images.unsplash.com/photo-1527443224154-c848a170fdca?w=600&q=80",
+      "description": "Nano-bezel HDR panel with ambient sync. Designed for creators."
+    },
+    {
+      "id": "p6",
+      "name": "Chrome Runner Sneakers",
+      "category": "fashion",
+      "price": 7499,
+      "rating": 4.4,
+      "reviews": 678,
+      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80",
+      "description": "Reactive cushioning with iridescent overlays and breathable mesh."
+    },
+    {
+      "id": "p7",
+      "name": "Quantum Laptop Air",
+      "category": "electronics",
+      "price": 92999,
+      "rating": 4.8,
+      "reviews": 167,
+      "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80",
+      "description": "Ultralight chassis, neural GPU boost, whisper-quiet thermal glass."
+    },
+    {
+      "id": "p8",
+      "name": "Holo Travel Backpack",
+      "category": "fashion",
+      "price": 4499,
+      "rating": 4.3,
+      "reviews": 289,
+      "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80",
+      "description": "Anti-gravity straps, RFID shielding, modular compartments."
+    }
+  ]
+}

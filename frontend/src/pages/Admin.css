@@ -1,0 +1,133 @@
+.admin {
+  padding-top: 32px;
+  padding-bottom: 64px;
+}
+
+.admin__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3vw, 2.2rem);
+}
+
+.admin__subtitle {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.admin__kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 28px 0;
+}
+
+.admin-kpi {
+  padding: 22px;
+}
+
+.admin-kpi__label {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.admin-kpi__value {
+  display: block;
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.admin-kpi__delta {
+  font-size: 0.85rem;
+  color: var(--neon);
+}
+
+.admin__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-chart {
+  padding: 22px;
+}
+
+.admin-chart h2 {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+}
+
+.admin-chart__body {
+  width: 100%;
+}
+
+.admin-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-table-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-table-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.admin-table-head span {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-table th {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.admin-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+@media (max-width: 960px) {
+  .admin__kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .admin__charts {
+    grid-template-columns: 1fr;
+  }
+}

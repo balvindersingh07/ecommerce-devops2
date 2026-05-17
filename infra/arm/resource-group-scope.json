@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_description": "Minimal subscription-level ARM stub: creates Resource Group only. Extend with nested deployments for ACR/AKS/Key Vault."
+  },
+  "parameters": {
+    "rgName": {
+      "type": "string",
+      "metadata": {
+        "description": "Target resource group name."
+      },
+      "defaultValue": "rg-ecommerce-capstone-dev"
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure region."
+      },
+      "defaultValue": "centralindia"
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "project": "ecommerce-capstone",
+        "env": "dev"
+      },
+      "metadata": {
+        "description": "Tags for governance / cost allocation."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('rgName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {}
+    }
+  ],
+  "outputs": {
+    "resourceGroupId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('rgName'))]"
+    }
+  }
+}

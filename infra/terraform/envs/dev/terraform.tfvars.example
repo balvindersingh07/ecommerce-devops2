@@ -1,0 +1,6 @@
+acr_name       = "acrecommerceexample"
+key_vault_name = "kv-ecommerce-example"
+tenant_id      = "00000000-0000-0000-0000-000000000000"
+budget_contact_emails = [
+  "ops@example.com"
+]

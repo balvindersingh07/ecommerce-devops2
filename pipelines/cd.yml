@@ -1,0 +1,96 @@
+trigger: none
+
+resources:
+  pipelines:
+    - pipeline: ciPipeline
+      source: "ci-pipeline"
+      trigger: true
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  aksResourceGroup: "rg-ecommerce-devops"
+  aksClusterName: "aks-ecommerce-devops"
+  acrLoginServer: "youracrname.azurecr.io"
+  keyVaultName: "kv-ecommerce-example"
+  tenantId: "00000000-0000-0000-0000-000000000000"
+  ingressHost: "ecommerce.example.com"
+  ingressHostStaging: "staging.ecommerce.example.com"
+  imageTag: "$(resources.pipeline.ciPipeline.runID)"
+
+stages:
+  - stage: DeployStaging
+    jobs:
+      - deployment: DeployToStaging
+        environment: "ecommerce-staging"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    cp -r k8s k8s-rendered
+                    sed -i "s/__KEYVAULT_NAME__/$(keyVaultName)/g" k8s-rendered/staging/secret-provider-class.yml
+                    sed -i "s/__TENANT_ID__/$(tenantId)/g" k8s-rendered/staging/secret-provider-class.yml
+                    sed -i "s/__INGRESS_HOST__/$(ingressHostStaging)/g" k8s-rendered/staging/ingress.yml || true
+                  displayName: "Render staging manifests with environment values"
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: deploy
+                    kubernetesServiceConnection: "aks-service-connection"
+                    namespace: "staging"
+                    manifests: |
+                      k8s-rendered/namespaces.yml
+                      k8s-rendered/staging/secret-provider-class.yml
+                      k8s-rendered/staging/network-policy.yml
+                      k8s-rendered/staging/ingress.yml
+                      k8s-rendered/staging/backend-deployment.yml
+                      k8s-rendered/staging/frontend-deployment.yml
+                    containers: |
+                      $(acrLoginServer)/backend:$(imageTag)
+                      $(acrLoginServer)/frontend:$(imageTag)
+
+  - stage: ApprovalGate
+    dependsOn: DeployStaging
+    condition: succeeded()
+    jobs:
+      - job: WaitForApproval
+        pool: server
+        steps:
+          - task: ManualValidation@0
+            timeoutInMinutes: 1440
+            inputs:
+              notifyUsers: ""
+              instructions: "Please validate staging and approve production rollout."
+
+  - stage: DeployProduction
+    dependsOn: ApprovalGate
+    condition: succeeded()
+    jobs:
+      - deployment: DeployToProduction
+        environment: "ecommerce-production"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    cp -r k8s k8s-rendered
+                    sed -i "s/__KEYVAULT_NAME__/$(keyVaultName)/g" k8s-rendered/production/secret-provider-class.yml
+                    sed -i "s/__TENANT_ID__/$(tenantId)/g" k8s-rendered/production/secret-provider-class.yml
+                    sed -i "s/__INGRESS_HOST__/$(ingressHost)/g" k8s-rendered/production/ingress.yml || true
+                  displayName: "Render production manifests with environment values"
+                - task: KubernetesManifest@1
+                  inputs:
+                    action: deploy
+                    kubernetesServiceConnection: "aks-service-connection"
+                    namespace: "production"
+                    manifests: |
+                      k8s-rendered/namespaces.yml
+                      k8s-rendered/production/secret-provider-class.yml
+                      k8s-rendered/production/network-policy.yml
+                      k8s-rendered/production/ingress.yml
+                      k8s-rendered/production/backend-deployment.yml
+                      k8s-rendered/production/frontend-deployment.yml
+                    containers: |
+                      $(acrLoginServer)/backend:$(imageTag)
+                      $(acrLoginServer)/frontend:$(imageTag)

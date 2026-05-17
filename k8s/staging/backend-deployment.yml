@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: backend-secrets-provider
+      containers:
+        - name: backend
+          image: youracrname.azurecr.io/backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: APPINSIGHTS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: appInsightsConnectionString
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: /mnt/secrets-store
+              readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: staging
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

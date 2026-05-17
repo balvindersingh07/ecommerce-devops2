@@ -1,0 +1,111 @@
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pr:
+  branches:
+    include:
+      - develop
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  acrName: "youracrname"
+  imageTag: "$(Build.BuildId)"
+
+stages:
+  - stage: BuildAndTest
+    jobs:
+      - job: Frontend
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+          - script: |
+              cd frontend
+              npm ci
+              npm run lint
+              npm run test
+              npm run build
+            displayName: "Frontend install, lint, test, build"
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "frontend/test-results/junit.xml"
+              failTaskOnFailedTests: true
+              testRunTitle: "Frontend Tests"
+
+      - job: Backend
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: "20.x"
+          - script: |
+              cd backend
+              npm ci
+              npm run lint
+              npm run test
+            displayName: "Backend install, lint and test"
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: "JUnit"
+              testResultsFiles: "backend/test-results/junit.xml"
+              failTaskOnFailedTests: true
+              testRunTitle: "Backend Tests"
+
+      - job: PublishArtifacts
+        dependsOn:
+          - Frontend
+          - Backend
+        condition: succeeded()
+        steps:
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.SourcesDirectory)/k8s"
+              artifact: "k8s-manifests"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(Build.SourcesDirectory)/infra/terraform"
+              artifact: "terraform-definitions"
+
+  - stage: BuildAndPushImages
+    dependsOn: BuildAndTest
+    condition: succeeded()
+    jobs:
+      - job: DockerBuildPush
+        steps:
+          - task: Docker@2
+            displayName: Build and push frontend image
+            inputs:
+              containerRegistry: "acr-service-connection"
+              repository: "frontend"
+              command: "buildAndPush"
+              Dockerfile: "frontend/Dockerfile"
+              buildContext: "."
+              tags: |
+                $(imageTag)
+                latest
+
+          - task: Docker@2
+            displayName: Build and push backend image
+            inputs:
+              containerRegistry: "acr-service-connection"
+              repository: "backend"
+              command: "buildAndPush"
+              Dockerfile: "backend/Dockerfile"
+              buildContext: "."
+              tags: |
+                $(imageTag)
+                latest
+
+      - job: SecurityScan
+        dependsOn: DockerBuildPush
+        steps:
+          - script: |
+              docker pull $(acrName).azurecr.io/backend:$(imageTag)
+              docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --exit-code 0 --severity HIGH,CRITICAL $(acrName).azurecr.io/backend:$(imageTag)
+            displayName: "Run Trivy scan for backend image"

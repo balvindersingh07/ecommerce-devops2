@@ -1,0 +1,10 @@
+node_modules/
+dist/
+test-results/
+.env
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
