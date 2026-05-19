@@ -126,6 +126,7 @@ Direct evidence images used in report:
 - Staging workloads: ![Staging workloads](docs/evidence/05-staging-workloads.png)
 - Production workloads: ![Production workloads](docs/evidence/01-production-workloads.png)
 - Staging endpoint HTTP 200: ![Staging curl 200](docs/evidence/03-staging-curl-200.png)
+- Local Docker containers running: ![Docker containers](docs/evidence/08-docker-containers.png)
 - ACR repositories: ![ACR repositories](docs/evidence/06-acr-repositories.png)
 - Key Vault secret: ![Key Vault secret](docs/evidence/02-keyvault-secret.png)
 - Budget configuration: ![Budget monthly](docs/evidence/04-budget-monthly.png)
