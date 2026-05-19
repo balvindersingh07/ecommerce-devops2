@@ -116,6 +116,23 @@ terraform apply
 - PR template: `.github/pull_request_template.md`
 - **Submission URLs placeholder:** `docs/SUBMISSION_LINKS.md`
 
+## Evidence Screenshots
+
+If screenshots are not visible on the repository home page, open the full report here:
+`docs/PROJECT_REPORT.md`
+
+Direct evidence images used in report:
+
+- Staging workloads: ![Staging workloads](docs/evidence/05-staging-workloads.png)
+- Production workloads: ![Production workloads](docs/evidence/01-production-workloads.png)
+- Staging endpoint HTTP 200: ![Staging curl 200](docs/evidence/03-staging-curl-200.png)
+- Production endpoint HTTP 200: ![Production curl 200](docs/evidence/08-production-curl-200.png)
+- ACR repositories: ![ACR repositories](docs/evidence/06-acr-repositories.png)
+- Key Vault secret: ![Key Vault secret](docs/evidence/02-keyvault-secret.png)
+- Budget configuration: ![Budget monthly](docs/evidence/04-budget-monthly.png)
+- Application Insights overview: ![Application Insights](docs/evidence/07-appinsights-overview.png)
+- Log Analytics overview: ![Log Analytics](docs/evidence/09-loganalytics-overview.png)
+
 ## Project Phase Mapping
 
 - Phase 1: `docs/architecture.md`, `docs/architecture.drawio`, `docs/cost-estimate.md`
