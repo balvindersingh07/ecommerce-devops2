@@ -286,29 +286,21 @@ Reliability controls:
 
 ![Staging curl 200](./evidence/03-staging-curl-200.png)
 
-4. Production endpoint returns HTTP 200
-
-![Production curl 200](./evidence/08-production-curl-200.png)
-
-5. ACR contains pushed images (`frontend`, `backend`)
+4. ACR contains pushed images (`frontend`, `backend`)
 
 ![ACR repositories](./evidence/06-acr-repositories.png)
 
-6. Key Vault secret available (`appInsightsConnectionString`)
+5. Key Vault secret available (`appInsightsConnectionString`)
 
 ![Key Vault secret](./evidence/02-keyvault-secret.png)
 
-7. Cost budget configured (`monthly-budget` with 50/80/100 thresholds)
+6. Cost budget configured (`monthly-budget` with 50/80/100 thresholds)
 
 ![Budget monthly](./evidence/04-budget-monthly.png)
 
-8. Application Insights telemetry resource configured
+7. Application Insights telemetry resource configured
 
 ![Application Insights overview](./evidence/07-appinsights-overview.png)
-
-9. Log Analytics workspace configured
-
-![Log Analytics overview](./evidence/09-loganalytics-overview.png)
 
 ### 8.2 Remaining Optional Attachments
 
