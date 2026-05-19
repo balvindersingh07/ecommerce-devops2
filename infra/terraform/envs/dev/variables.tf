@@ -52,7 +52,7 @@ variable "node_count" {
 
 variable "node_vm_size" {
   type    = string
-  default = "Standard_B2s"
+  default = "Standard_D2s_v3"
 }
 
 variable "tags" {

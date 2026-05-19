@@ -1,6 +1,15 @@
-acr_name       = "acrecommerceexample"
-key_vault_name = "kv-ecommerce-example"
-tenant_id      = "00000000-0000-0000-0000-000000000000"
-budget_contact_emails = [
-  "ops@example.com"
-]
+# Copy this file to terraform.tfvars (kept out of Git — see repo .gitignore).
+#
+# tenant_id MUST be real — PowerShell:
+#   az account show --query tenantId -o tsv
+#
+# acr_name: globally unique, 5–50 chars, letters + digits only (no dots/hyphens).
+# key_vault_name: globally unique, 3–24 chars, alphanumeric only.
+
+acr_name            = "acrecommerceYOURUNIQUE01"
+key_vault_name      = "kvecommerceYOURUNIQUE01"
+tenant_id           = "REPLACE_WITH_OUTPUT_OF_az_account_show_query_tenantId"
+budget_contact_emails = ["YOUR_EMAIL@example.com"]
+
+# If AKS fails with insufficient quota for standardBsv2Family, omit this — repo defaults to Standard_D2s_v3.
+# node_vm_size = "Standard_D2s_v3"

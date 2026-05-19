@@ -8,3 +8,7 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfstate
 *.tfstate.*
+
+# Terraform local vars / plans (no secrets in repo)
+infra/terraform/envs/**/terraform.tfvars
+*.tfplan

@@ -10,7 +10,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "8m"
 spec:
   rules:
-    - host: __INGRESS_HOST__
+    - host: staging.ecommerce.local
       http:
         paths:
           - path: /api

@@ -54,8 +54,9 @@ variable "node_count" {
 }
 
 variable "node_vm_size" {
-  type    = string
-  default = "Standard_B2s"
+  type        = string
+  description = "AKS node size (quota varies by region/subscription; avoid standardBsv2Family if quota is 0)."
+  default     = "Standard_D2s_v3"
 }
 
 variable "tags" {
@@ -73,4 +74,10 @@ variable "budget_amount_usd" {
 variable "budget_contact_emails" {
   type    = list(string)
   default = []
+}
+
+# Optional RFC3339 budget start; leave empty to use first day of current UTC month.
+variable "budget_start_date" {
+  type    = string
+  default = ""
 }

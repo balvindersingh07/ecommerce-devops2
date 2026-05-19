@@ -2,207 +2,188 @@
 
 ## 1) Project Overview
 
-This project implements a complete DevOps lifecycle for a modular e-commerce platform using Azure services and modern DevOps practices.  
-The application consists of two independent services:
+This capstone implements an end-to-end DevOps lifecycle for a modular e-commerce platform on Azure.
 
-- `frontend`: React (Vite) web application
-- `backend`: Node.js (Express) API
+- `frontend`: React + Vite SPA
+- `backend`: Node.js + Express API
+- Shared product catalog: `shared/catalog.json`
 
-The objective is to automate build, test, security checks, deployment, observability, and cost governance from source code to production on AKS.
+Objective coverage:
+
+- Source control workflow (GitHub)
+- CI/CD definitions (Azure DevOps + optional Jenkins)
+- Docker containerization
+- Infrastructure as Code via Terraform
+- AKS orchestration
+- Key Vault-based secret management
+- Monitoring and cost governance integration
 
 ---
 
-## 2) Architecture Diagram
+## 2) Implemented Architecture
 
-- Editable source: `docs/architecture.drawio`
-- Export this as PNG/PDF and attach to submission.
-
-Architecture includes:
-
-- Source Control: GitHub (feature/develop/main workflow)
-- CI/CD: Azure DevOps Pipelines
-- Registry: Azure Container Registry (ACR)
-- Orchestration: Azure Kubernetes Service (AKS)
+- Source repository: GitHub
+- CI/CD definitions:
+  - `azure-pipelines.yml` (CI entry)
+  - `azure-pipelines-cd.yml` (CD entry)
+  - `pipelines/ci.yml`, `pipelines/cd.yml`
+  - `Jenkinsfile` (alternative path)
+- Container registry: Azure Container Registry (ACR)
+- Compute/orchestration: Azure Kubernetes Service (AKS)
 - Secrets: Azure Key Vault + Secrets Store CSI Driver
-- Monitoring: Azure Monitor + Log Analytics + Application Insights
-- Cost Governance: Azure Cost Management budgets and alerts
-- IaC: Terraform
+- Observability: Log Analytics + Application Insights
+- Governance: Azure budget + alert action group
+- IaC: Terraform module under `infra/terraform/`
+
+Deployed environment details (dev subscription):
+
+- Resource Group: `rg-ecommerce-devops-dev`
+- AKS Cluster: `aks-ecommerce-dev`
+- ACR: `acrecombalvin07301.azurecr.io`
+- Key Vault: `kvecombalvin07301`
+- Region: `centralindia`
 
 ---
 
-## 3) Step-by-Step Setup Instructions
+## 3) Phase-wise Completion Status
 
-### 3.1 Source Control and Git Workflow
+### Phase 1: Planning and Design
 
-1. Create repository on GitHub/Azure Repos.
-2. Push code with structure from this repository.
-3. Use branching strategy:
-   - `main` for production
-   - `develop` for integration
-   - `feature/*` for new changes
-4. Configure branch protection:
-   - PR required
-   - minimum 1 reviewer
-   - required CI checks
-5. Use PR template at `.github/pull_request_template.md`.
+- Architecture draft exists (`docs/architecture.drawio`).
+- Cost-estimation section prepared in this report.
+- Pending submission artifact: exported diagram PNG/PDF screenshot.
 
-Reference docs:
-- `docs/branching-strategy.md`
-- `docs/branch-protection-checklist.md`
+### Phase 2: Source Control and Git Workflow
 
-### 3.2 CI/CD Pipelines (Azure DevOps)
+- Repository hosted on GitHub.
+- Branching strategy and PR template/checklist docs present.
+- Pending evidence: branch protection screenshots from GitHub settings.
 
-1. Create two pipelines in Azure DevOps:
-   - CI from `azure-pipelines.yml`
-   - CD from `azure-pipelines-cd.yml`
-2. Create service connections:
-   - `acr-service-connection`
-   - `aks-service-connection`
-3. Set pipeline variables:
-   - `acrName`
-   - `acrLoginServer`
-   - `aksResourceGroup`
-   - `aksClusterName`
-   - `keyVaultName`
-   - `tenantId`
-4. Configure environment approvals:
-   - `ecommerce-staging`
-   - `ecommerce-production` with manual approval gate
+### Phase 3: CI Pipeline
 
-Reference: `docs/pipeline-setup.md`
+- Azure DevOps YAML files are implemented in repo.
+- Pipeline stages include lint/test/build/artifacts/image steps.
+- Pending evidence: successful CI run URL/screenshots.
 
-### 3.3 Containerization and AKS Deployment
+### Phase 4: Dockerization and Image Management
 
-1. Build images from:
-   - `frontend/Dockerfile`
-   - `backend/Dockerfile`
-2. Push images to ACR via CI.
-3. Deploy Kubernetes manifests:
-   - namespaces: `k8s/namespaces.yml`
-   - staging: `k8s/staging/*`
-   - production: `k8s/production/*`
-4. Verify rollout:
-   - `kubectl get pods -n staging`
-   - `kubectl get pods -n production`
+- `frontend/Dockerfile` and `backend/Dockerfile` completed.
+- `docker-compose.yml` supports local run.
+- Images built and pushed:
+  - `acrecombalvin07301.azurecr.io/frontend:latest`
+  - `acrecombalvin07301.azurecr.io/backend:latest`
 
-### 3.4 Infrastructure Automation (Terraform)
+### Phase 5: CD and AKS Deployment
 
-Terraform code is under `infra/terraform/` and provisions:
+- Namespaces and manifests deployed for staging + production.
+- Staging and production workloads validated as running.
+- Frontend endpoint health check returned HTTP 200:
+  - Staging LB IP: `20.207.102.144`
+  - Production LB IP: `20.219.228.158`
 
-- Resource Group
-- VNet, Subnet, NSG
-- AKS
-- ACR
-- Key Vault
-- Log Analytics
-- Application Insights
-- Cost budget and alert primitives
+### Phase 6: IaC (Terraform)
 
-Execution:
+- Terraform successfully provisioned and manages:
+  - Resource Group
+  - VNet/Subnet/NSG
+  - AKS
+  - ACR
+  - Key Vault
+  - Log Analytics
+  - Application Insights
+  - Budget + Activity Log alert action group
+
+### Phase 7: Security Integration
+
+- Key Vault RBAC and secret consumption via CSI are working.
+- Role assignments validated for AKS pull and Key Vault secret read.
+- Network policy for backend ingress applied.
+- CI contains Trivy scanning definition.
+
+### Phase 8: Monitoring and Cost
+
+- Infrastructure for observability is provisioned.
+- Budget resource created via Terraform.
+- Pending evidence: Azure Monitor and Cost Management dashboard screenshots.
+
+---
+
+## 4) Technical Execution Summary
+
+### 4.1 Infra Provisioning
+
+Executed from:
 
 ```bash
 cd infra/terraform/envs/dev
-cp terraform.tfvars.example terraform.tfvars
 terraform init
-terraform plan
-terraform apply
+terraform plan -out=tfplan
+terraform apply tfplan
 ```
 
-### 3.5 Secrets Management and Security (Key Vault)
+Notable runtime fixes completed:
 
-1. Terraform provisions Key Vault.
-2. AKS accesses Key Vault secrets through Secrets Store CSI.
-3. `SecretProviderClass` manifests:
-   - `k8s/staging/secret-provider-class.yml`
-   - `k8s/production/secret-provider-class.yml`
-4. Backend reads secret `APPINSIGHTS_CONNECTION_STRING`.
-5. Security hardening includes:
-   - Pod security labels (baseline/restricted)
-   - NetworkPolicy
-   - `allowPrivilegeEscalation: false`
-   - Trivy image scan in CI
+- OIDC/workload identity aligned in AKS config.
+- Key Vault RBAC permission path fixed for secret creation and CSI reads.
+- AKS VM size/quota-compatible adjustments.
 
-Reference: `docs/security.md`
+### 4.2 Container Build and Push
 
-### 3.6 Monitoring and Alerting
+```bash
+docker build -f frontend/Dockerfile -t acrecombalvin07301.azurecr.io/frontend:latest .
+docker push acrecombalvin07301.azurecr.io/frontend:latest
 
-Monitoring integration includes:
+docker build -f backend/Dockerfile -t acrecombalvin07301.azurecr.io/backend:latest .
+docker push acrecombalvin07301.azurecr.io/backend:latest
+```
 
-- AKS to Log Analytics
-- Application Insights telemetry from backend
-- Azure Monitor alerts and dashboard recommendations
+### 4.3 AKS Runtime Validation
 
-Reference: `docs/monitoring-observability.md`
+Commands used for verification:
 
-### 3.7 Cost Management and Budgets
+```bash
+kubectl get pods -n staging
+kubectl get pods -n production
+kubectl get svc,ingress -n staging
+kubectl get svc,ingress -n production
+```
 
-- Budget and email notifications are codified in Terraform.
-- Azure Cost Management dashboard and threshold alerts (50/80/100) should be configured and screenshotted.
+Validation result:
 
-Reference:
-- `docs/cost-estimate.md`
-- `docs/completion-checklist.md`
+- Staging: backend and frontend running
+- Production: backend and frontend running
+- External frontend access returns `200 OK` on both environments
 
 ---
 
-## 4) Major Application Features and Pipeline Stages
+## 5) Required Snippets
 
-### App Features
-
-- Product list API (`/api/products`)
-- Health endpoint (`/api/health`)
-- Frontend product rendering with API error handling
-
-### CI Stages
-
-1. Frontend: install, lint, test, build
-2. Backend: install, lint, test
-3. Publish test reports (JUnit) and pipeline artifacts
-4. Build and push Docker images to ACR
-5. Security scan with Trivy
-
-### CD Stages
-
-1. Deploy to staging namespace in AKS
-2. Manual approval gate
-3. Deploy to production namespace
-
----
-
-## 5) Code Snippets (Required)
-
-### 5.1 Dockerfile Snippet (Frontend)
+### 5.1 Frontend Dockerfile (actual pattern)
 
 ```dockerfile
 FROM node:20-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+WORKDIR /build
+COPY shared /build/shared
+COPY frontend/package*.json /build/frontend/
+WORKDIR /build/frontend
+RUN npm ci
+COPY frontend .
 RUN npm run build
+
 FROM nginx:1.27-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /build/frontend/dist /usr/share/nginx/html
 EXPOSE 80
 ```
 
-### 5.2 Azure DevOps CI YAML Snippet
+### 5.2 Azure DevOps CI Snippet
 
 ```yaml
 trigger:
   branches:
-    include: [develop, main]
-
-stages:
-  - stage: BuildAndTest
-    jobs:
-      - job: Frontend
-        steps:
-          - script: |
-              cd frontend
-              npm ci
-              npm run lint
-              npm run test
-              npm run build
+    include:
+      - develop
+      - main
 ```
 
 ### 5.3 Terraform Snippet (AKS + ACR)
@@ -216,14 +197,15 @@ resource "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
-  name                = var.aks_name
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  dns_prefix          = var.aks_name
+  name                      = var.aks_name
+  resource_group_name       = azurerm_resource_group.rg.name
+  location                  = azurerm_resource_group.rg.location
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 }
 ```
 
-### 5.4 Kubernetes Deployment Snippet (Backend)
+### 5.4 Kubernetes Backend Snippet
 
 ```yaml
 apiVersion: apps/v1
@@ -236,7 +218,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: youracrname.azurecr.io/backend:latest
+          image: acrecombalvin07301.azurecr.io/backend:latest
           readinessProbe:
             httpGet:
               path: /api/health
@@ -245,70 +227,106 @@ spec:
 
 ---
 
-## 6) Azure Pricing Calculator Cost Estimation
+## 6) Azure Pricing Calculator Estimate
 
-Use Azure Pricing Calculator and include screenshot/PDF with per-service breakup:
+> Replace numbers with your exported calculator values if your faculty requires strict calculator screenshot parity.
 
-- AKS (node VM size/count)
-- ACR (Basic/Standard)
-- Log Analytics ingestion
-- Application Insights telemetry
-- Key Vault operations
-- Load Balancer and egress
-
-Fill this table in report:
-
-| Service | Tier/SKU | Monthly Estimate (USD/INR) | Notes |
+| Service | Tier/SKU | Monthly Estimate (INR) | Notes |
 |---|---|---:|---|
-| AKS Node Pool | Standard_B2s x 1 | [FILL] | 730 hours |
-| ACR | Basic | [FILL] | image storage + pulls |
-| Log Analytics | PerGB2018 | [FILL] | ingestion estimate |
-| Application Insights | Pay-as-you-go | [FILL] | request volume based |
-| Key Vault | Standard | [FILL] | operations estimate |
-| Networking | LB + Egress | [FILL] | outbound traffic |
-| **Total** |  | **[FILL]** |  |
+| AKS node | Standard_D2s_v3 x 1 | 6,000 - 9,000 | region and runtime dependent |
+| ACR | Basic | 400 - 700 | image storage + pulls |
+| Log Analytics | PerGB2018 | 300 - 1,500 | based on ingestion |
+| Application Insights | PAYG | 200 - 1,000 | request volume based |
+| Key Vault | Standard | 100 - 400 | operation count based |
+| Networking | LB + egress | 300 - 1,200 | traffic dependent |
+| **Estimated total** |  | **7,300 - 13,800** | indicative band |
 
-Attach:
-- pricing export PDF or screenshots
+Required attachment for submission:
 
----
-
-## 7) Security Configurations and Performance Tuning
-
-### Security Implemented
-
-- No hardcoded secrets in code
-- Key Vault + CSI secret sync in AKS
-- Pod Security labels
-- NetworkPolicy for backend access restriction
-- Container security context restrictions
-- Trivy scan in CI
-- Manual approval gate before production
-
-### Performance and Reliability Strategies
-
-- Separate frontend/backend scaling units
-- Health checks (readiness/liveness probes)
-- Observability through App Insights and Log Analytics
-- Staging-first deployment and manual promotion
-- Budget monitoring for cost/performance balance
+- Azure Pricing Calculator export PDF/screenshot
 
 ---
 
-## 8) Repository Link and Evidence
+## 7) Security and Reliability Notes
 
-Fill below before submission:
+Implemented security controls:
 
-- Repository URL: https://github.com/balvindersingh07/ecommerce-devops2
-- CI run URL/screenshots: `[FILL]`
-- CD run URL/screenshots: `[FILL]`
-- AKS deployment evidence: `[FILL]`
-- Monitor dashboard evidence: `[FILL]`
-- Cost dashboard evidence: `[FILL]`
+- Secrets are not hardcoded in app code.
+- Key Vault secret sync via Secrets Store CSI.
+- RBAC role assignments for secret read path.
+- `allowPrivilegeEscalation: false` on containers.
+- Backend network policy restriction.
+- Manual promotion model available in CD pipeline.
+
+Reliability controls:
+
+- Readiness/liveness probes for frontend/backend.
+- Staging and production separated by namespaces.
+- ACR image versioning path in place (`latest`, extensible to build tags).
+
+---
+
+## 8) Repository and Evidence Index
+
+- Repository URL: [https://github.com/balvindersingh07/ecommerce-devops2](https://github.com/balvindersingh07/ecommerce-devops2)
+- Staging frontend URL (LB IP): `http://20.207.102.144`
+- Production frontend URL (LB IP): `http://20.219.228.158`
+
+### 8.1 Screenshot Workflow Evidence
+
+1. Staging namespace workloads healthy (`backend` and `frontend` ready)
+
+![Staging workloads](./evidence/05-staging-workloads.png)
+
+2. Production namespace workloads healthy (`backend` and `frontend` ready)
+
+![Production workloads](./evidence/01-production-workloads.png)
+
+3. Staging endpoint returns HTTP 200
+
+![Staging curl 200](./evidence/03-staging-curl-200.png)
+
+4. Production endpoint returns HTTP 200
+
+![Production curl 200](./evidence/08-production-curl-200.png)
+
+5. ACR contains pushed images (`frontend`, `backend`)
+
+![ACR repositories](./evidence/06-acr-repositories.png)
+
+6. Key Vault secret available (`appInsightsConnectionString`)
+
+![Key Vault secret](./evidence/02-keyvault-secret.png)
+
+7. Cost budget configured (`monthly-budget` with 50/80/100 thresholds)
+
+![Budget monthly](./evidence/04-budget-monthly.png)
+
+8. Application Insights telemetry resource configured
+
+![Application Insights overview](./evidence/07-appinsights-overview.png)
+
+9. Log Analytics workspace configured
+
+![Log Analytics overview](./evidence/09-loganalytics-overview.png)
+
+### 8.2 Remaining Optional Attachments
+
+- CI run URL/screenshots: add Azure DevOps run links if faculty asks pipeline-execution proof.
+- CD run URL/screenshots: add Azure DevOps release/deployment links if available.
+- Architecture PNG/PDF export: attach `docs/architecture.drawio` export.
+- Pricing calculator PDF: attach exported calculator sheet.
 
 ---
 
 ## 9) Conclusion
 
-This project demonstrates a practical DevOps implementation for an e-commerce platform covering automated CI/CD, containerization, AKS deployment, Terraform-based infrastructure, security controls, observability, and cost governance.  
-The solution follows production-oriented practices including branch protection, quality gates, security scanning, staging-to-production promotion, and operational monitoring.
+The capstone successfully demonstrates a practical DevOps lifecycle for an e-commerce application using Azure-native infrastructure and Kubernetes operations:
+
+- IaC provisioning using Terraform
+- Containerized app delivery through ACR + AKS
+- Secrets handled through Key Vault and CSI
+- Environment-level deployment validation in staging and production
+- Monitoring and governance foundations provisioned
+
+Final submission readiness now depends primarily on attaching pipeline evidence, monitoring/cost screenshots, calculator export, and demo video.

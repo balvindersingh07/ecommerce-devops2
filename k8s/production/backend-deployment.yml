@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: production
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -22,7 +22,7 @@ spec:
               secretProviderClass: backend-secrets-provider
       containers:
         - name: backend
-          image: youracrname.azurecr.io/backend:latest
+          image: acrecombalvin07301.azurecr.io/backend:latest
           ports:
             - containerPort: 5000
           env:
@@ -33,7 +33,7 @@ spec:
                   key: appInsightsConnectionString
           securityContext:
             allowPrivilegeEscalation: false
-            runAsNonRoot: true
+            runAsNonRoot: false
           livenessProbe:
             httpGet:
               path: /api/health

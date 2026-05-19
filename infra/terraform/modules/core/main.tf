@@ -13,6 +13,13 @@ provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
+locals {
+  # Monthly budgets cannot start before the current calendar month (Azure API rule).
+  budget_period_start = var.budget_start_date != "" ? var.budget_start_date : "${formatdate("YYYY-MM", timestamp())}-01T00:00:00Z"
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
@@ -91,20 +98,19 @@ resource "azurerm_key_vault" "kv" {
   resource_group_name           = azurerm_resource_group.rg.name
   tenant_id                     = var.tenant_id
   sku_name                      = "standard"
+  enable_rbac_authorization     = true
   purge_protection_enabled      = false
   soft_delete_retention_days    = 7
   public_network_access_enabled = true
   tags                          = var.tags
+}
 
-  access_policy {
-    tenant_id = var.tenant_id
-    object_id = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+resource "azurerm_role_assignment" "kv_terraform_secrets_officer" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azurerm_client_config.current.object_id
 
-    secret_permissions = [
-      "Get",
-      "List"
-    ]
-  }
+  depends_on = [azurerm_key_vault.kv]
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
@@ -112,6 +118,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   dns_prefix          = var.aks_name
+  oidc_issuer_enabled = true
+  workload_identity_enabled = true
 
   default_node_pool {
     name           = "system"
@@ -154,6 +162,11 @@ resource "azurerm_key_vault_secret" "appinsights_connection_string" {
   name         = "appInsightsConnectionString"
   value        = azurerm_application_insights.appinsights.connection_string
   key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [
+    azurerm_key_vault.kv,
+    azurerm_role_assignment.kv_terraform_secrets_officer,
+  ]
 }
 
 resource "azurerm_monitor_action_group" "ops_email_group" {
@@ -181,8 +194,8 @@ resource "azurerm_monitor_activity_log_alert" "aks_admin_failures" {
   tags                = var.tags
 
   criteria {
-    category = "Administrative"
-    level    = "Error"
+    category      = "Administrative"
+    level         = "Error"
     resource_type = "Microsoft.ContainerService/managedClusters"
   }
 
@@ -200,7 +213,11 @@ resource "azurerm_consumption_budget_resource_group" "rg_budget" {
   time_grain = "Monthly"
 
   time_period {
-    start_date = "2026-01-01T00:00:00Z"
+    start_date = local.budget_period_start
+  }
+
+  lifecycle {
+    ignore_changes = [time_period]
   }
 
   notification {
